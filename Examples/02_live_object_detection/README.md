@@ -32,18 +32,28 @@ Once the container is successfully built, run the container.
 
 On a system without a GPU:
 ```sh
-podman run -it -v $(pwd)/object_detection_files:/object_detection_files:Z  -v /tmp/.X11-unix/:/tmp/.X11-unix/ -v /dev/dri:/dev/dri -v /dev/video0:/dev/video0 --security-opt=label=type:container_runtime_t --ipc=host -e DISPLAY object_detection /bin/bash
+CONTAINER_DISPLAY_ARGS="-v /tmp/.X11-unix/:/tmp/.X11-unix/ -v /dev/dri:/dev/dri --ipc=host -e DISPLAY"
+podman run -it -v $(pwd)/object_detection_files:/object_detection_files:Z  -v /dev/video0:/dev/video0 $CONTAINER_DISPLAY_ARGS object_detection /bin/bash
 ```
 
 On a system with a GPU, you can manually pass in the NVIDIA devices:
+```sh
+CONTAINER_DISPLAY_ARGS="-v /tmp/.X11-unix/:/tmp/.X11-unix/ -v /dev/dri:/dev/dri --ipc=host -e DISPLAY"
+NVIDIA_DEVICES=$(\ls /dev/nvidia* | xargs -I{} echo '--device {}:{}')
+podman run -it -v $(pwd)/object_detection_files:/object_detection_files:Z  -v /dev/video0:/dev/video0 $CONTAINER_DISPLAY_ARGS $NVIDIA_DEVICES object_detection /bin/bash
+```
 
 Or if you have the nvidia-container-runtime-hook installed:
- 
+```sh
+CONTAINER_DISPLAY_ARGS="-v /tmp/.X11-unix/:/tmp/.X11-unix/ -v /dev/dri:/dev/dri --ipc=host -e DISPLAY"
+NVIDIA_HOOK_ARGS="--security-opt=no-new-privileges --cap-drop=ALL --security-opt label=type:nvidia_container_t"
+podman run -it -v $(pwd)/object_detection_files:/object_detection_files:Z  -v /dev/video0:/dev/video0 $CONTAINER_DISPLAY_ARGS $NVIDIA_HOOK_ARGS object_detection /bin/bash
+```
 
-Once in the container, you can use `nvidia-smi` to verify GPU access.
+Of course if you will only be running the script to an output video file, you don't need the $CONTAINER_DISPLAY args. Similarly, if you will not use a webcam you don't need to pass in /dev/video0 as a volume.
 
 ## Run the script:
-
+Once inside the container, 
 ```sh
 cd /object_detection_files
 ```
@@ -52,11 +62,18 @@ To see the options the script has:
 ```
 python3 object_detection.py --help
 ```
+To stop the program running, press ESC.
 
 To run with cuda on webcam footage
 ```
 python3 object_detection.py --cuda
 ```
+
+To run with cuda on video footage
+```
+python3 object_detection.py --cuda --input-video /path/to/video
+```
+
 
 ## References:
 This example uses code from Chris Fotache's ["Object detection and tracking in PyTorch" article](https://towardsdatascience.com/object-detection-and-tracking-in-pytorch-b3cf1a696a98) and [GitHub project](https://github.com/cfotache/pytorch_objectdetecttrack).
