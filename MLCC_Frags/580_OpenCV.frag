@@ -6,5 +6,6 @@ RUN set -vx \
 && /tmp/yum_install.sh \
     opencv \
     opencv-core \
-    opencv-devel
+    opencv-devel \
+&& pip3 install opencv-python
 

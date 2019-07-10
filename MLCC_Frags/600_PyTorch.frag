@@ -5,7 +5,8 @@ RUN set -vx \
 \
 && echo -e '\
 set -vx \n\
-PYTORCH_VERSION="torch-1.0.0" \n\
+PYTORCH_VERSION="torch-1.1.0" \n\
+TORCHVISION_VERSION="torchvision-0.3.0" \n\
 if [ -d "/usr/local/cuda-10.1" ]; then \n\
     CUDA_VER="cu101" \n\
 elif [ -d "/usr/local/cuda-10.0" ]; then \n\
@@ -29,12 +30,11 @@ case ${PYTHON_VERSION_OUTPUT:7:3} in \n\
     3.7) PYTHON_VER_SPEC="cp37-cp37m" ;; \n\
     *) PYTHON_VER_SPEC="UNKNOWN" ;; \n\
 esac \n\
-echo "https://download.pytorch.org/whl/$CUDA_VER/$PYTORCH_VERSION-$PYTHON_VER_SPEC-linux_x86_64.whl" \n' \
+echo "https://download.pytorch.org/whl/$CUDA_VER/$PYTORCH_VERSION-$PYTHON_VER_SPEC-linux_x86_64.whl https://download.pytorch.org/whl/$CUDA_VER/$TORCHVISION_VERSION-$PYTHON_VER_SPEC-linux_x86_64.whl" \n' \
 > /tmp/select_pytorch.sh \
 \
 && /usr/local/bin/pip3 -v install \
     `sh /tmp/select_pytorch.sh` \
-    torchvision \
 \
 && /usr/local/bin/python3 -c 'import torch'
 
