@@ -26,7 +26,7 @@ This will take 30 - 60 minutes, so in the meantime you can download the dataset.
 ## Download Dataset
 Run the dataset download script to download the [Fashion MINST](https://github.com/zalandoresearch/fashion-mnist) dataset in this directory: 
 ```sh
-$ ./download_dataset.sh
+./download_dataset.sh
 ```
 
 ## Run the container
