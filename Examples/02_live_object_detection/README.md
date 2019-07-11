@@ -1,7 +1,6 @@
-In the directory with mlcc, create a Dockerfile using mlcc for running pytorch and jupyter on your local machine.
-
-
 # Running live object detection on video frames
+
+In the directory with mlcc, create a Dockerfile using mlcc for running pytorch and jupyter on your local machine.
 In this example we will use MLCC to build a container for running the YOLOv3 model in PyTorch to detect objects in video from files or the webcam. OpenCV is used for the video I/O, and for drawing bounding boxes. The program can be run using GPU acceleration with CUDA, or just on CPU (with a limited framerate). 
 
 ## Before you start
@@ -43,11 +42,10 @@ NVIDIA_DEVICES=$(\ls /dev/nvidia* | xargs -I{} echo '--device {}:{}')
 podman run -it -v $(pwd)/object_detection_files:/object_detection_files:Z  -v /dev/video0:/dev/video0 $CONTAINER_DISPLAY_ARGS $NVIDIA_DEVICES object_detection /bin/bash
 ```
 
-Or if you have the nvidia-container-runtime-hook installed:
+Or in the case where you have the nvidia-container-runtime-hook installed, and won't be using a webcam or display:
 ```sh
-CONTAINER_DISPLAY_ARGS="-v /tmp/.X11-unix/:/tmp/.X11-unix/ -v /dev/dri:/dev/dri --ipc=host -e DISPLAY"
 NVIDIA_HOOK_ARGS="--security-opt=no-new-privileges --cap-drop=ALL --security-opt label=type:nvidia_container_t"
-podman run -it -v $(pwd)/object_detection_files:/object_detection_files:Z  -v /dev/video0:/dev/video0 $CONTAINER_DISPLAY_ARGS $NVIDIA_HOOK_ARGS object_detection /bin/bash
+podman run -it -v $(pwd)/object_detection_files:/object_detection_files:Z  $CONTAINER_DISPLAY_ARGS $NVIDIA_HOOK_ARGS object_detection /bin/bash
 ```
 
 Of course if you will only be running the script to an output video file, you don't need the $CONTAINER_DISPLAY args. Similarly, if you will not use a webcam you don't need to pass in /dev/video0 as a volume.
@@ -69,9 +67,9 @@ To run with cuda on webcam footage
 python3 object_detection.py --cuda
 ```
 
-To run with cuda on video footage
+To run with cuda on video footage and output to a video instead of the screen
 ```
-python3 object_detection.py --cuda --input-video /path/to/video
+python3 object_detection.py --cuda --input-video /path/to/video --output-video output_video.webm --no-display
 ```
 
 
